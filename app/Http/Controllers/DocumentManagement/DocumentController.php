@@ -449,7 +449,7 @@ class DocumentController extends Controller
         if (! $this->hasAutosavePayload($request, $validated)) {
             return response()->json([
                 'saved' => false,
-                'draft_id' => $request->integer('draft_id') ?: null,
+                'draft_id' => $request->filled('draft_id') ? (int) $request->input('draft_id') : null,
             ]);
         }
 
@@ -790,7 +790,7 @@ class DocumentController extends Controller
         if (filled($request->input('draft_id'))) {
             $draft = Document::query()
                 ->with('status')
-                ->findOrFail($request->integer('draft_id'));
+                ->findOrFail((int) $request->input('draft_id'));
 
             $this->authorizeDraftAccess($request, $draft);
 
@@ -1137,7 +1137,7 @@ class DocumentController extends Controller
 
         $draft = Document::query()
             ->with(['status', 'documentLevel', 'files', 'departments', 'officialPreparer', 'resubmittedFrom.files', 'resubmittedFrom.status', 'revisedFrom.status', 'revisedFrom.documentLevel', 'revisedFrom.departments'])
-            ->findOrFail($request->integer('draft_id'));
+            ->findOrFail((int) $request->input('draft_id'));
 
         $this->authorizeDraftAccess($request, $draft);
 
