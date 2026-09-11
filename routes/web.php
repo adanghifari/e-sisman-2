@@ -107,4 +107,12 @@ Route::middleware(['auth', 'verified', 'route.permission'])->group(function () {
     Route::get('reports/export', [OverviewController::class, 'export'])->name('reports.export');
     Route::get('activity-log/export', ActivityLogExportController::class)->name('activity-log.export');
     Route::get('activity-log', ActivityLogController::class)->name('activity-log.index');
+    Route::view('users', 'placeholder', ['title' => 'User'])->name('users.index');
+    Route::view('access-groups', 'placeholder', ['title' => 'Group Akses'])->name('access-groups.index');
+    Route::view('access-menus', 'placeholder', ['title' => 'Menu Akses'])->name('access-menus.index');
+    Route::view('approval-flows', 'placeholder', ['title' => 'Approval Flow'])->name('approval-flows.index');
+    Route::view('master-data/process-functions', 'placeholder', ['title' => 'Proses / Fungsi'])->name('master-data.process-functions');
+    Route::view('master-data/business-processes', 'placeholder', ['title' => 'Proses Bisnis'])->name('master-data.business-processes');
+    Route::view('master-data/departments', 'placeholder', ['title' => 'Department'])->name('master-data.departments');
+    Route::view('master-data/document-types', 'placeholder', ['title' => 'Jenis Dokumen'])->name('master-data.document-types');
 });

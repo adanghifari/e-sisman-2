@@ -378,10 +378,10 @@ class OverviewController extends Controller
 
     private function yearOptions(array $levelIds): array
     {
-        $years = $this->publishedDocuments($levelIds)
+        $years = collect($this->publishedDocuments($levelIds)
             ->map(fn (Document $document) => $document->tanggal_terbit ?? $document->approved_at)
             ->filter()
-            ->map(fn ($date): int => (int) $date->format('Y'))
+            ->map(fn ($date): int => (int) $date->format('Y')))
             ->push(now()->year)
             ->unique()
             ->sortDesc()

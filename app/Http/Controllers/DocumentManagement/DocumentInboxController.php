@@ -112,17 +112,15 @@ class DocumentInboxController extends Controller
             return 0;
         }
 
-        return once(function () use ($request): int {
-            $filters = [
-                'search' => '',
-                'type' => '',
-                'status' => '',
-                'stage' => '',
-                'sort' => 'newest',
-            ];
+        $filters = [
+            'search' => '',
+            'type' => '',
+            'status' => '',
+            'stage' => '',
+            'sort' => 'newest',
+        ];
 
-            return $this->myTasksQuery($request, $filters)->count();
-        });
+        return $this->myTasksQuery($request, $filters)->count();
     }
 
     /**
@@ -264,7 +262,12 @@ class DocumentInboxController extends Controller
             );
         }
 
-        $query->whereIn('id', $relevantDocumentIds);
+        $query->whereIn('id', $relevantDocumentIds
+            ->pluck('t_document_id')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all());
 
         $this->applyTaskFilters($query, $request, $filters, $approvalScope, $assignedMonitorApprovalScope);
         $this->applyOrdering($query, $request, $filters, history: false);
@@ -298,11 +301,20 @@ class DocumentInboxController extends Controller
                 }),
         );
 
+        $relevantDocumentIds = $relevantDocumentIds
+            ->pluck('t_document_id')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
         $query = Document::query()
             ->select('t_document.*')
             ->with($this->historyEagerLoads($approvalScope, $assignedApprovalScope))
             ->whereIn('id', $relevantDocumentIds)
-            ->whereNot($assignedMonitorDocumentScope);
+            ->whereNotIn('id', Document::query()
+                ->select('id')
+                ->where($assignedMonitorDocumentScope));
 
         $this->applyHistoryFilters($query, $request, $filters, $approvalScope, $assignedApprovalScope);
         $this->applyOrdering($query, $request, $filters, history: true);
