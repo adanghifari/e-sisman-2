@@ -421,6 +421,7 @@ class DocumentApprovalController extends Controller
         $this->authorizeDocumentAccess($request, $document);
         abort_unless($document->status?->nama_status === StatusDocument::PROPOSED, 404);
         $this->authorizedFileDocument($document, $file);
+        abort_if($file->type_file === DocumentFile::TYPE_REVISION_CONTENT, 404);
 
         $sourcePath = Storage::disk('local')->path($file->path_file);
         abort_unless(is_file($sourcePath), 404);

@@ -333,6 +333,7 @@ class DocumentObsoleteController extends Controller
         $document->loadMissing('status');
 
         abort_unless($file->t_document_id === $document->id, 404);
+        abort_if($file->type_file === DocumentFile::TYPE_REVISION_CONTENT, 404);
         abort_unless($document->status?->nama_status === StatusDocument::OBSOLETE, 404);
         abort_unless($document->request_type !== 'obsolete', 404);
     }
@@ -600,7 +601,9 @@ class DocumentObsoleteController extends Controller
             'tanggal_terbit' => $publishedAt,
             'approved_at' => $doc->approved_at,
             'tanggal_obsolete' => $doc->obsolete_at,
-            'detail_url' => route('documents.obsolete.show', $doc),
+            'detail_url' => $isImported
+                ? route('documents.existing.imports.show', $doc)
+                : route('documents.obsolete.show', $doc),
             'child_documents' => collect(),
             'obsoleteChildDocuments' => collect(),
         ];

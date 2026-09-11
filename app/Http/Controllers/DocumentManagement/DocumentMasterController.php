@@ -215,17 +215,19 @@ class DocumentMasterController extends Controller
                 ?? collect(),
             'contentFiles' => $contentFiles,
             'primaryContentFile' => $primaryContentFile,
-            'attachmentFiles' => $document->files
-                ->whereIn('type_file', [DocumentFile::TYPE_ATTACHMENT, DocumentFile::TYPE_REVISION_FORM])
-                ->sortBy(fn (DocumentFile $file): string => $file->type_file === DocumentFile::TYPE_REVISION_FORM
-                    ? sprintf('%010d-%010d-%010d', 0, 0, $file->id)
-                    : $file->attachmentSortKey())
-                ->values(),
+            'attachmentFiles' => $isWorkflow
+                ? $document->files
+                    ->whereIn('type_file', [DocumentFile::TYPE_ATTACHMENT, DocumentFile::TYPE_REVISION_FORM])
+                    ->sortBy(fn (DocumentFile $file): string => $file->type_file === DocumentFile::TYPE_REVISION_FORM
+                        ? sprintf('%010d-%010d-%010d', 0, 0, $file->id)
+                        : $file->attachmentSortKey())
+                    ->values()
+                : collect(),
             'generatedPrintout' => $this->latestGeneratedPrintout($document),
             'canPreviewGeneratedPrintout' => $isWorkflow && app(DynamicFinalDocumentRenderer::class)
                 ->canRender($document, PdfDocumentContext::finalFor($document)),
             'downloadPrintoutUrl' => (! $isWorkflow && $primaryContentFile)
-                ? route('documents.master.files.show', [$document, $primaryContentFile])
+                ? route('documents.existing.imports.files.show', [$document, $primaryContentFile])
                 : null,
             'documentHistory' => app(DocumentHistory::class)->forDocument($document),
             'relatedObsoleteDocuments' => $this->relatedObsoleteDocumentsForMaster($document),
@@ -250,8 +252,8 @@ class DocumentMasterController extends Controller
         ]);
 
         $obsoleteStatusId = StatusDocument::query()
-            ->where('nama_status', StatusDocument::OBSOLETE)
-            ->value('id');
+            ->firstOrCreate(['nama_status' => StatusDocument::OBSOLETE])
+            ->id;
 
         DB::transaction(function () use ($document, $validated, $obsoleteStatusId): void {
             $document->update([
@@ -265,7 +267,7 @@ class DocumentMasterController extends Controller
         });
 
         return redirect()
-            ->route('documents.obsolete.show', $document)
+            ->route('documents.existing.imports.show', $document)
             ->with('status', 'Dokumen master hasil import berhasil diobsolete.');
     }
 
@@ -446,6 +448,7 @@ class DocumentMasterController extends Controller
         $document->loadMissing('status');
 
         abort_unless($file->t_document_id === $document->id, 404);
+        abort_if($file->type_file === DocumentFile::TYPE_REVISION_CONTENT, 404);
         abort_unless(
             in_array($document->status?->nama_status, [StatusDocument::APPROVED, StatusDocument::OBSOLETE], true),
             404,
@@ -650,7 +653,9 @@ class DocumentMasterController extends Controller
             'proses_bisnis' => $document->businessProcess?->nama_proses_bisnis,
             'proses_fungsi' => $document->businessFunction?->nama_proses_fungsi,
             'tanggal_terbit' => $document->tanggal_terbit ?? $document->approved_at,
-            'detail_url' => route('documents.master.show', $document),
+            'detail_url' => $isImported
+                ? route('documents.master.imported.show', $document)
+                : route('documents.master.show', $document),
             'can_request_revision' => $this->canRequestRevision($request, $document),
             'obsolete_documents' => $this->relatedObsoleteDocumentsForMaster($document),
         ];
@@ -704,7 +709,8 @@ class DocumentMasterController extends Controller
         foreach ($family as $revision) {
             if ($revision->id !== $master->id
                 && $revision->m_status_document_id === $obsoleteStatusId
-                && $revision->request_type !== 'obsolete') {
+                && $revision->request_type !== 'obsolete'
+                && $revision->numeric_revision < $master->numeric_revision) {
                 $visitedIds->push($revision->id);
                 $obsoleteDocuments->push($revision);
             }
@@ -781,9 +787,31 @@ class DocumentMasterController extends Controller
                 'nomor_dokumen' => $doc->nomor_dokumen ?: $master->nomor_dokumen ?: '-',
                 'nomor_revisi' => $doc->formatted_revision,
                 'tanggal_terbit' => $doc->tanggal_terbit ?? $doc->approved_at,
-                'tanggal_obsolete' => $doc->obsolete_at,
+                'tanggal_obsolete' => $this->obsoleteDateForRelatedDocument($doc, $family),
                 'detail_url' => route('documents.obsolete.show', $doc),
             ]);
+    }
+
+    private function obsoleteDateForRelatedDocument(Document $document, Collection $family): mixed
+    {
+        if ($document->obsolete_at !== null) {
+            return $document->obsolete_at;
+        }
+
+        return $family
+            ->filter(fn (Document $candidate): bool => $candidate->id !== $document->id
+                && $candidate->numeric_revision > $document->numeric_revision
+                && in_array($candidate->status?->nama_status, [StatusDocument::APPROVED, StatusDocument::OBSOLETE], true)
+                && $candidate->request_type !== 'obsolete'
+                && ($candidate->tanggal_terbit !== null || $candidate->approved_at !== null))
+            ->sortBy(fn (Document $candidate): string => sprintf(
+                '%010d-%010d-%010d',
+                $candidate->numeric_revision,
+                $candidate->tanggal_terbit?->timestamp ?? $candidate->approved_at?->timestamp ?? 0,
+                $candidate->id,
+            ))
+            ->map(fn (Document $candidate) => $candidate->tanggal_terbit ?? $candidate->approved_at)
+            ->first();
     }
 
     private function importedMasterNote(Document $document): string

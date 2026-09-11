@@ -119,6 +119,12 @@
                             <dt class="text-sm font-semibold text-slate-500">Department Terkait</dt>
                             <dd class="text-sm font-bold text-slate-900">{{ $document->departments->map(fn ($department) => ($department->kode_department ? $department->kode_department.' - ' : '').$department->nama_department)->implode(', ') ?: '-' }}</dd>
                         </div>
+                        @if ($document->origin !== \App\Models\Document::ORIGIN_WORKFLOW && filled($document->catatan))
+                            <div class="grid gap-1 py-3 md:grid-cols-[220px_minmax(0,1fr)]">
+                                <dt class="text-sm font-semibold text-slate-500">Catatan Import</dt>
+                                <dd class="whitespace-pre-line text-sm font-bold leading-6 text-slate-900">{{ $document->catatan }}</dd>
+                            </div>
+                        @endif
                     </dl>
 
                     @if (filled($originNotice))

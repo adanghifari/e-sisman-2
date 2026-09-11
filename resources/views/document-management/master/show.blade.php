@@ -8,7 +8,7 @@
     :revision-request-display-number="$revisionRequestDisplayNumber"
     :stamp-label="$document->status?->nama_status === \App\Models\StatusDocument::OBSOLETE ? 'Obsolete' : 'Master'"
     :stamp-tone="$document->status?->nama_status === \App\Models\StatusDocument::OBSOLETE ? 'red' : 'sky'"
-    file-route-prefix="documents.master"
+    :file-route-prefix="$document->origin === \App\Models\Document::ORIGIN_WORKFLOW ? 'documents.master' : 'documents.existing.imports'"
     :approval-flow-stages="$approvalFlowStages"
     :content-files="$contentFiles"
     :attachment-files="$attachmentFiles"
@@ -45,7 +45,7 @@
                             </button>
                         @else
                             <a
-                                href="{{ route('documents.create.level', ['level-4', 'revised_from' => $document->id]) }}"
+                                href="{{ route('documents.create.level', $document->origin === \App\Models\Document::ORIGIN_WORKFLOW ? ['level-4', 'revised_from' => $document->id] : ['level-4', 'imported_source' => $document->id]) }}"
                                 class="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-sky-300 hover:bg-sky-50 hover:text-sky-700"
                             >
                                 <x-flux.icon name="arrow-path" class="size-4" />
