@@ -2,15 +2,17 @@
 
 namespace App\Actions\Fortify;
 
+use App\Concerns\PasswordValidationRules;
+use App\Concerns\ProfileValidationRules;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use App\Support\Auth\ResolvesDepartmentFromIdentity;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 
 class CreateNewUser implements CreatesNewUsers
 {
-    use PasswordValidationRules;
+    use PasswordValidationRules, ProfileValidationRules;
 
     /**
      * Validate and create a newly registered user.
@@ -20,21 +22,20 @@ class CreateNewUser implements CreatesNewUsers
     public function create(array $input): User
     {
         Validator::make($input, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique(User::class),
-            ],
+            ...$this->profileRules(),
+            'm_department_id' => ['nullable', 'integer', Rule::exists('departments', 'id')],
+            'department_code' => ['nullable', 'string'],
+            'kode_department' => ['nullable', 'string'],
+            'department_name' => ['nullable', 'string'],
+            'nama_department' => ['nullable', 'string'],
             'password' => $this->passwordRules(),
         ])->validate();
 
         return User::create([
+            'm_department_id' => app(ResolvesDepartmentFromIdentity::class)->resolveId($input),
             'name' => $input['name'],
             'email' => $input['email'],
-            'password' => Hash::make($input['password']),
+            'password' => $input['password'],
         ]);
     }
 }
