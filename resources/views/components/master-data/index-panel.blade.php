@@ -23,14 +23,14 @@
         <x-ui.input
             :label="$searchLabel"
             name="search"
-            wire:model.live.debounce.300ms="search"
+            wire:model.debounce.300ms="search"
             :placeholder="$searchPlaceholder"
         />
 
         <x-ui.select
             label="Status"
             name="status"
-            wire:model.live="status"
+            wire:model="status"
             :value="$status"
             :options="$statusOptions"
         />
