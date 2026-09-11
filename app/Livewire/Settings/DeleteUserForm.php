@@ -41,7 +41,7 @@ class DeleteUserForm extends Component
 
         $user->delete();
 
-        redirect('/');
+        $this->redirect('/');
     }
 
     public function render()

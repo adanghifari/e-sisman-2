@@ -8,7 +8,10 @@ use Illuminate\Support\Facades\Session;
 
 class Logout
 {
-    public function __invoke(): RedirectResponse
+    /**
+     * @return \Livewire\Redirector|\Illuminate\Http\RedirectResponse
+     */
+    public function __invoke()
     {
         Auth::guard('web')->logout();
 
