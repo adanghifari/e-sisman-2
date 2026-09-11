@@ -1785,7 +1785,7 @@ class DocumentController extends Controller
                 Document::normalizeRevisionNumber($row->nomor_revisi),
                 $row->id,
             ))
-            ->value('id');
+            ->first()?->id;
     }
 
     private function replaceSingleDocumentFile(Document $document, string $type): void

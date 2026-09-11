@@ -312,6 +312,10 @@ class Document extends Model
             return $revision;
         }
 
+        if (is_numeric($revision) && ! str_contains((string) $revision, '.')) {
+            return (int) $revision;
+        }
+
         $parts = explode('.', (string) $revision, 2);
         $major = (int) preg_replace('/\D+/', '', $parts[0] ?? '0');
         $minor = (int) preg_replace('/\D+/', '', $parts[1] ?? '0');
