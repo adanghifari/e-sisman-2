@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use App\Livewire\Settings\DeleteUserForm;
+use App\Livewire\Settings\TwoFactor\RecoveryCodes;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Livewire::component('settings.delete-user-form', DeleteUserForm::class);
+        Livewire::component('settings.two-factor.recovery-codes', RecoveryCodes::class);
     }
 }

@@ -93,6 +93,10 @@
                             <span class="block truncate text-xs text-white/80">{{ $user?->email }}</span>
                         </span>
                     </summary>
+                    <div class="mt-2 space-y-1">
+                        <a href="{{ route('profile.edit') }}" class="block rounded-lg border border-sky-700 bg-sky-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-sky-800">Profile</a>
+                        <a href="{{ route('security.edit') }}" class="block rounded-lg border border-sky-700 bg-sky-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-sky-800">Security</a>
+                    </div>
                     <form method="POST" action="{{ route('logout') }}" class="mt-2">
                         @csrf
                         <button type="submit" class="w-full rounded-lg border border-sky-700 bg-sky-900 px-3 py-2 text-left text-sm font-semibold text-white transition hover:bg-sky-800">Log out</button>

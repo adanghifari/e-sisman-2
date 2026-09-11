@@ -124,3 +124,5 @@ Route::middleware(['auth', 'verified', 'route.permission'])->group(function () {
     Route::get('master-data/departments', DepartmentIndex::class)->name('master-data.departments');
     Route::get('master-data/document-types', DocumentTypeIndex::class)->name('master-data.document-types');
 });
+
+require __DIR__.'/settings.php';

@@ -34,6 +34,8 @@ class PortedUiRoutesTest extends TestCase
             route('master-data.business-processes'),
             route('master-data.departments'),
             route('master-data.document-types'),
+            route('profile.edit'),
+            route('appearance.edit'),
         ];
 
         foreach ($routes as $route) {
@@ -41,5 +43,10 @@ class PortedUiRoutesTest extends TestCase
                 ->get($route)
                 ->assertOk();
         }
+
+        $this->actingAs($user)
+            ->withSession(['auth.password_confirmed_at' => time()])
+            ->get(route('security.edit'))
+            ->assertOk();
     }
 }
