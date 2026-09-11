@@ -17,7 +17,7 @@
         '6xl' => 'max-w-6xl',
         '7xl' => 'max-w-7xl',
     ][$maxWidth] ?? 'max-w-2xl';
-    $titleId = 'modal-title-'.str()->uuid();
+    $titleId = 'modal-title-'.\Illuminate\Support\Str::uuid();
 @endphp
 
 <div class="app-modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 px-4 py-6">

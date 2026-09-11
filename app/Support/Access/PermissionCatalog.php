@@ -29,7 +29,8 @@ class PermissionCatalog
             ->sortBy([
                 ['module', 'asc'],
                 ['label', 'asc'],
-            ]);
+            ])
+            ->keyBy('feature_key');
     }
 
     public function enforceReadDependencies(array $permissionIds): array
