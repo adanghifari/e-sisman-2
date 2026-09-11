@@ -23,6 +23,18 @@ use App\Livewire\MasterData\DocumentType\Index as DocumentTypeIndex;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
+Route::post('login', [\Laravel\Fortify\Http\Controllers\AuthenticatedSessionController::class, 'store'])
+    ->middleware(array_filter([
+        'guest:'.config('fortify.guard'),
+        config('fortify.limiters.login') ? 'throttle:'.config('fortify.limiters.login') : null,
+    ]))
+    ->name('login.store');
+Route::post('two-factor-challenge', [\Laravel\Fortify\Http\Controllers\TwoFactorAuthenticatedSessionController::class, 'store'])
+    ->middleware(array_filter([
+        'guest:'.config('fortify.guard'),
+        config('fortify.limiters.two-factor') ? 'throttle:'.config('fortify.limiters.two-factor') : null,
+    ]))
+    ->name('two-factor.login.store');
 
 Route::get('ttd-digital/{approval}', DigitalSignatureVerificationController::class)
     ->name('digital-signatures.verify');
