@@ -1420,7 +1420,7 @@ class ImportedExistingDocumentTest extends TestCase
         Storage::disk('local')->assertMissing('documents/imported-existing/test-old.pdf');
     }
 
-    public function test_show_imported_cleans_up_duplicate_existing_document_files(): void
+    public function test_show_imported_does_not_delete_existing_document_files(): void
     {
         Storage::fake('local');
         [$user, $level, $documentType, $businessProcess, $businessFunction, $department] = $this->existingMasterFixture([
@@ -1463,10 +1463,12 @@ class ImportedExistingDocumentTest extends TestCase
         $this->actingAs($user)
             ->get(route('documents.master.imported.show', $importedMaster))
             ->assertOk()
-            ->assertSee('file2.pdf')
-            ->assertDontSee('file1.pdf');
+            ->assertSee('file1.pdf')
+            ->assertSee('file2.pdf');
 
-        $this->assertCount(1, $importedMaster->files()->where('type_file', DocumentFile::TYPE_IMPORTED_DOCUMENT)->get());
+        $this->assertCount(2, $importedMaster->files()->where('type_file', DocumentFile::TYPE_IMPORTED_DOCUMENT)->get());
+        Storage::disk('local')->assertExists($file1->path_file);
+        Storage::disk('local')->assertExists($file2->path_file);
     }
 
     public function test_imported_existing_master_revision_can_display_stages_and_be_assigned_approvers(): void
