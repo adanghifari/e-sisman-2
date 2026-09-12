@@ -739,6 +739,7 @@ class ImportedExistingDocumentTest extends TestCase
             ->assertSee('PS-SMR-PAGE-TEST')
             ->assertSee('Imported Master Page Test')
             ->assertSee('name="imported_source"', false)
+            ->assertDontSee('name="revised_from"', false)
             ->assertSee('value="'.$source->id.'"', false);
     }
 

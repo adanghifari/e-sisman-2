@@ -768,7 +768,7 @@ class DocumentController extends Controller
         }
 
         return collect($validated)
-            ->except(['draft_id', 'revised_from'])
+            ->except(['draft_id', 'revised_from', 'imported_source'])
             ->filter(function (mixed $value): bool {
                 if (is_array($value)) {
                     return collect($value)->filter(fn ($item): bool => filled($item))->isNotEmpty();

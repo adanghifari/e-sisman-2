@@ -194,6 +194,46 @@ class DocumentAutosaveTest extends TestCase
         $this->assertSame('Revisi tahap 1', $draft->catatan_revisi);
     }
 
+    public function test_autosave_does_not_create_empty_imported_revision_draft_from_source_only(): void
+    {
+        [$user, $businessProcess, $businessFunction, $department] = $this->autosaveFixture();
+
+        $level2 = \App\Models\DocumentLevel::query()->firstOrCreate(['kode' => 'level-2'], ['nama_level' => 'Level II', 'nama_dokumen' => 'Prosedur', 'prefix' => 'PS']);
+        \App\Models\DocumentLevel::query()->firstOrCreate(['kode' => 'level-4'], ['nama_level' => 'Level IV', 'nama_dokumen' => 'Formulir', 'prefix' => 'FM']);
+        DocumentType::query()->firstOrCreate(['nama_types' => 'Form']);
+        $approvedStatus = StatusDocument::query()->firstOrCreate(['nama_status' => StatusDocument::APPROVED]);
+        $importedMaster = Document::create([
+            'm_document_level_id' => $level2->id,
+            'm_status_document_id' => $approvedStatus->id,
+            'm_document_types_id' => DocumentType::query()->where('nama_types', 'Prosedur')->value('id'),
+            'm_proses_bisnis_id' => $businessProcess->id,
+            'm_proses_fungsi_id' => $businessFunction->id,
+            'user_id' => $user->id,
+            'origin' => Document::ORIGIN_IMPORTED_CURRENT,
+            'nama_dokumen' => 'Imported Master',
+            'nomor_dokumen' => 'PS-OPS-IMPORTED',
+            'nomor_revisi' => 0,
+        ]);
+
+        $user->forceFill(['m_department_id' => $department->id])->save();
+        $importedMaster->departments()->attach($department->id);
+
+        $this->actingAs($user)
+            ->postJson(route('documents.autosave', 'level-4'), [
+                'imported_source' => $importedMaster->id,
+            ])
+            ->assertOk()
+            ->assertJson([
+                'saved' => false,
+                'draft_id' => null,
+            ]);
+
+        $this->assertSame(0, Document::query()
+            ->where('user_id', $user->id)
+            ->whereHas('status', fn ($query) => $query->where('nama_status', StatusDocument::DRAFT))
+            ->count());
+    }
+
     private function autosaveFixture(): array
     {
         StatusDocument::query()->firstOrCreate(['nama_status' => StatusDocument::DRAFT]);
