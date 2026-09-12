@@ -69,9 +69,11 @@
                    "optimize-autoloader":  true,
                    "preferred-install":  "dist",
                    "sort-packages":  true,
-                   "audit":  {
-                                 "block-insecure":  false
-                             }
+                   "policy":  {
+                                  "advisories":  {
+                                                     "block":  false
+                                                 }
+                              }
                },
     "minimum-stability":  "stable",
     "prefer-stable":  true
