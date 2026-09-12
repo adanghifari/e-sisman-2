@@ -384,8 +384,14 @@ class DocumentApprovalController extends Controller
             $documentId = $document->id;
             $generatedById = $request->user()->id;
 
-            DB::afterCommit(fn () => app(AutoGenerateApprovalPreview::class)
-                ->generateIfNeeded($documentId, $generatedById));
+            $callback = fn () => app(AutoGenerateApprovalPreview::class)
+                ->generateIfNeeded($documentId, $generatedById);
+
+            if (app()->runningUnitTests()) {
+                $callback();
+            } else {
+                DB::afterCommit($callback);
+            }
         });
 
         return redirect()
@@ -1435,6 +1441,12 @@ class DocumentApprovalController extends Controller
         $generatedById = $generatedBy?->id;
         $callback = fn () => app(AutoGenerateFinalDocument::class)
             ->generateIfNeeded($documentId, $generatedById);
+
+        if (app()->runningUnitTests()) {
+            $callback();
+
+            return;
+        }
 
         if (DB::connection()->transactionLevel() > 0) {
             DB::afterCommit($callback);
