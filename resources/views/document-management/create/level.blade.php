@@ -362,6 +362,9 @@
                 <input type="hidden" name="draft_id" value="{{ $draft?->id }}" data-autosave-draft-id>
                 @if ($revisionSource)
                     <input type="hidden" name="revised_from" value="{{ $revisionSource->id }}">
+                    @if (request()->filled('imported_source') || $revisionSource->origin !== \App\Models\Document::ORIGIN_WORKFLOW)
+                        <input type="hidden" name="imported_source" value="{{ $revisionSource->id }}">
+                    @endif
                 @endif
                 @if ($resubmissionSource)
                     <input type="hidden" name="resubmitted_from" value="{{ $resubmissionSource->id }}">
@@ -504,6 +507,9 @@
                 <input type="hidden" name="draft_id" value="{{ $draft?->id }}" data-autosave-draft-id>
                 @if ($revisionSource)
                     <input type="hidden" name="revised_from" value="{{ $revisionSource->id }}">
+                    @if (request()->filled('imported_source') || $revisionSource->origin !== \App\Models\Document::ORIGIN_WORKFLOW)
+                        <input type="hidden" name="imported_source" value="{{ $revisionSource->id }}">
+                    @endif
                 @endif
                 @if ($resubmissionSource)
                     <input type="hidden" name="resubmitted_from" value="{{ $resubmissionSource->id }}">

@@ -546,7 +546,7 @@ class ImportedExistingDocumentController extends Controller
         });
 
         $detailRoute = $document->fresh()?->isMaster()
-            ? 'documents.master.show'
+            ? 'documents.master.imported.show'
             : 'documents.existing.imports.show';
 
         return redirect()
@@ -935,6 +935,7 @@ class ImportedExistingDocumentController extends Controller
             'relations' => ['nullable', 'array', 'max:2'],
             'relations.*.relation_reference' => ['nullable', 'string', 'max:255'],
             'relations.*.related_document_id' => ['nullable', 'integer', Rule::exists('t_document', 'id')],
+            'relations.*.related_imported_existing_document_id' => ['nullable', 'integer', Rule::exists('t_document', 'id')],
             'relations.*.relation_type' => ['required_with:relations', Rule::in(DocumentRelation::RELATION_TYPES)],
             'relations.*.keterangan' => ['nullable', 'string', 'max:1000'],
             'confirm_imported_master_number_reuse' => ['nullable', 'boolean'],
@@ -1011,7 +1012,17 @@ class ImportedExistingDocumentController extends Controller
         $relationErrors = [];
 
         foreach ($validated['relations'] ?? [] as $index => $relation) {
-            if (filled($relation['relation_reference'] ?? null)) {
+            $hasImportedId = filled($relation['related_imported_existing_document_id'] ?? null);
+            $hasDocId = filled($relation['related_document_id'] ?? null);
+            $hasRef = filled($relation['relation_reference'] ?? null);
+
+            if ($hasImportedId && $hasDocId) {
+                $relationErrors["relations.{$index}.related_imported_existing_document_id"] = 'Pilih satu target relasi saja.';
+
+                continue;
+            }
+
+            if ($hasRef) {
                 $relationAttributes = $this->relationTargetAttributes(
                     $relation['relation_reference'],
                     $relation['relation_type'] ?? null,
@@ -1024,11 +1035,14 @@ class ImportedExistingDocumentController extends Controller
                 }
 
                 $validated['relations'][$index]['related_document_id'] = $relationAttributes['target_document_id'];
+            } elseif ($hasImportedId) {
+                $validated['relations'][$index]['related_document_id'] = (int) $relation['related_imported_existing_document_id'];
             }
 
             $targetId = $validated['relations'][$index]['related_document_id'] ?? null;
             if (! filled($targetId)) {
                 $relationErrors["relations.{$index}.related_document_id"] = 'Pilih target relasi.';
+                $relationErrors["relations.{$index}.related_imported_existing_document_id"] = 'Pilih target relasi.';
             }
         }
 
@@ -1529,7 +1543,7 @@ class ImportedExistingDocumentController extends Controller
             ->map(fn (Document $document): array => [
                 'value' => 'existing-'.$document->id,
                 'label' => $this->documentOptionLabel($document),
-                'meta' => ($document->origin === Document::ORIGIN_WORKFLOW ? 'Dokumen Workflow' : 'Import Master').' - Revisi '.$document->formatted_revision,
+                'meta' => ($document->origin === Document::ORIGIN_WORKFLOW ? 'Dokumen Workflow' : 'Imported Master').' - Revisi '.$document->formatted_revision,
                 'is_master' => true,
                 'document_level_id' => $document->m_document_level_id,
                 'business_process_id' => $document->m_proses_bisnis_id,
@@ -1562,16 +1576,27 @@ class ImportedExistingDocumentController extends Controller
 
     private function replacementReferenceIsMasterCandidate(string $reference): bool
     {
+        $targetId = DocumentRelation::targetDocumentIdForReference($reference);
+
+        if ($targetId === null) {
+            return false;
+        }
+
         return collect($this->relationDocumentOptions())
-            ->contains(fn (array $document): bool => $document['value'] === $reference);
+            ->contains(fn (array $document): bool => DocumentRelation::targetDocumentIdForReference($document['value']) === $targetId);
     }
 
     private function replacementReferenceMatchesCurrentRuleContext(array $validated): bool
     {
         $replacementReference = (string) ($validated['replacement_reference'] ?? '');
+        $targetId = DocumentRelation::targetDocumentIdForReference($replacementReference);
+
+        if ($targetId === null) {
+            return false;
+        }
 
         return collect($this->relationDocumentOptions())
-            ->contains(fn (array $document): bool => $document['value'] === $replacementReference
+            ->contains(fn (array $document): bool => DocumentRelation::targetDocumentIdForReference($document['value']) === $targetId
                 && (string) $document['document_level_id'] === (string) ($validated['m_document_level_id'] ?? '')
                 && (string) $document['business_process_id'] === (string) ($validated['m_proses_bisnis_id'] ?? '')
                 && (string) $document['business_function_id'] === (string) ($validated['m_proses_fungsi_id'] ?? ''));

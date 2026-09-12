@@ -194,6 +194,18 @@ class DocumentMasterController extends Controller
             DocumentFile::TYPE_IMPORTED_DOCUMENT,
             DocumentFile::TYPE_REVISION_CONTENT,
         ])->values();
+
+        if (! $isWorkflow && $contentFiles->count() > 1) {
+            $keepFile = $contentFiles->first();
+            $duplicateFiles = $contentFiles->slice(1);
+            foreach ($duplicateFiles as $dupFile) {
+                Storage::disk('local')->delete($dupFile->path_file);
+                $dupFile->delete();
+            }
+            $contentFiles = collect([$keepFile]);
+            $document->unsetRelation('files');
+        }
+
         $primaryContentFile = $contentFiles->first();
 
         return view('document-management.master.show', [

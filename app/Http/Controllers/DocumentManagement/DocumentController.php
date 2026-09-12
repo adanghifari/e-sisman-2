@@ -228,9 +228,11 @@ class DocumentController extends Controller
                         'revisedFrom.documentLevel',
                     ]);
 
+                    $revisionSourceErrorKey = $request->filled('imported_source') ? 'imported_source' : 'revised_from';
+
                     if ($lockedRevisionSource->status?->nama_status !== StatusDocument::APPROVED) {
                         throw ValidationException::withMessages([
-                            'revised_from' => 'Master sumber sudah berubah. Muat ulang halaman sebelum membuat revisi.',
+                            $revisionSourceErrorKey => 'Master sumber sudah berubah. Muat ulang halaman sebelum membuat revisi.',
                         ]);
                     }
 
@@ -240,7 +242,7 @@ class DocumentController extends Controller
 
                     if ($draft === null && $this->hasActiveRevisionRequest($lockedRevisionSource)) {
                         throw ValidationException::withMessages([
-                            'revised_from' => 'Dokumen ini masih memiliki pengajuan revisi aktif. Selesaikan atau batalkan revisi tersebut terlebih dahulu.',
+                            $revisionSourceErrorKey => 'Dokumen ini masih memiliki pengajuan revisi aktif. Selesaikan atau batalkan revisi tersebut terlebih dahulu.',
                         ]);
                     }
 

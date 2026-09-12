@@ -52,6 +52,14 @@ class Document extends Model
 
     public const ORIGIN_IMPORTED_LEGACY = 'imported_legacy';
 
+    public const STATE_MASTER = 'master';
+
+    public const STATE_OBSOLETE = 'obsolete';
+
+    public const CURRENT_RULE = 'current_rule';
+
+    public const LEGACY_RULE = 'legacy_rule';
+
     protected $table = 't_document';
 
     public $timestamps = false;

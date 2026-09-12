@@ -27,6 +27,7 @@
                     @if ($canEdit ?? false)
                         <a
                             href="{{ route('documents.master.imports.edit', $document) }}"
+                            title="Edit Dokumen"
                             class="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-sky-300 hover:bg-sky-50 hover:text-sky-700"
                         >
                             <x-flux.icon name="pencil-square" class="size-4" />
