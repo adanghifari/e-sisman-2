@@ -10,9 +10,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('t_document', function (Blueprint $table): void {
-            $table->string('nomor_lembar_revisi')->nullable()->after('nomor_dokumen');
-        });
+        if (! Schema::hasColumn('t_document', 'nomor_lembar_revisi')) {
+            Schema::table('t_document', function (Blueprint $table): void {
+                $table->string('nomor_lembar_revisi')->nullable()->after('nomor_dokumen');
+            });
+        }
 
         $documents = DB::table('t_document')
             ->select([
