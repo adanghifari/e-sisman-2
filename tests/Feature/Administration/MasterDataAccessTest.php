@@ -2,7 +2,10 @@
 
 namespace Tests\Feature\Administration;
 
+use App\Livewire\MasterData\BusinessFunction\Index as BusinessFunctionIndex;
 use App\Livewire\MasterData\BusinessProcess\Index as BusinessProcessIndex;
+use App\Livewire\MasterData\Department\Index as DepartmentIndex;
+use App\Livewire\MasterData\DocumentType\Index as DocumentTypeIndex;
 use App\Models\BusinessProcess;
 use App\Models\Permission;
 use App\Models\Role;
@@ -87,5 +90,34 @@ class MasterDataAccessTest extends TestCase
         $user->roles()->attach($role);
 
         return $user->refresh();
+    }
+
+    public function test_master_data_components_resolve_by_canonical_and_aliased_names(): void
+    {
+        // BusinessFunction
+        $this->assertSame(BusinessFunctionIndex::class, Livewire::getClass('master-data.business-function.index'));
+        $this->assertSame(BusinessFunctionIndex::class, Livewire::getClass('master-data.process-functions'));
+        $this->assertSame(BusinessFunctionIndex::class, Livewire::getClass('master-data.process-functions.index'));
+        $this->assertSame(BusinessFunctionIndex::class, Livewire::getClass('master-data.business-functions'));
+        $this->assertSame(BusinessFunctionIndex::class, Livewire::getClass('app.livewire.master-data.business-function.index'));
+        $this->assertSame(BusinessFunctionIndex::class, Livewire::getClass('app.livewire.master-data.process-functions'));
+
+        // BusinessProcess
+        $this->assertSame(BusinessProcessIndex::class, Livewire::getClass('master-data.business-process.index'));
+        $this->assertSame(BusinessProcessIndex::class, Livewire::getClass('master-data.business-processes'));
+        $this->assertSame(BusinessProcessIndex::class, Livewire::getClass('app.livewire.master-data.business-process.index'));
+        $this->assertSame(BusinessProcessIndex::class, Livewire::getClass('app.livewire.master-data.business-processes'));
+
+        // Department
+        $this->assertSame(DepartmentIndex::class, Livewire::getClass('master-data.department.index'));
+        $this->assertSame(DepartmentIndex::class, Livewire::getClass('master-data.departments'));
+        $this->assertSame(DepartmentIndex::class, Livewire::getClass('app.livewire.master-data.department.index'));
+        $this->assertSame(DepartmentIndex::class, Livewire::getClass('app.livewire.master-data.departments'));
+
+        // DocumentType
+        $this->assertSame(DocumentTypeIndex::class, Livewire::getClass('master-data.document-type.index'));
+        $this->assertSame(DocumentTypeIndex::class, Livewire::getClass('master-data.document-types'));
+        $this->assertSame(DocumentTypeIndex::class, Livewire::getClass('app.livewire.master-data.document-type.index'));
+        $this->assertSame(DocumentTypeIndex::class, Livewire::getClass('app.livewire.master-data.document-types'));
     }
 }

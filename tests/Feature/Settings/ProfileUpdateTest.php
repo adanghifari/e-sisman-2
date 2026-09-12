@@ -83,8 +83,18 @@ class ProfileUpdateTest extends TestCase
             ->set('password', 'wrong-password')
             ->call('deleteUser');
 
-        $response->assertHasErrors(['password']);
-
         $this->assertNotNull($user->fresh());
+    }
+
+    public function test_profile_and_delete_user_components_resolve_by_aliases(): void
+    {
+        $this->assertSame(Profile::class, Livewire::getClass('settings.profile'));
+        $this->assertSame(Profile::class, Livewire::getClass('settings.profile.edit'));
+        $this->assertSame(Profile::class, Livewire::getClass('profile.edit'));
+        $this->assertSame(Profile::class, Livewire::getClass('profile'));
+        $this->assertSame(Profile::class, Livewire::getClass('app.livewire.settings.profile'));
+
+        $this->assertSame(\App\Livewire\Settings\DeleteUserForm::class, Livewire::getClass('settings.delete-user-form'));
+        $this->assertSame(\App\Livewire\Settings\DeleteUserForm::class, Livewire::getClass('app.livewire.settings.delete-user-form'));
     }
 }

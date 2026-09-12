@@ -153,6 +153,21 @@ class ApprovalFlowTest extends TestCase
             Index::class,
             Livewire::getClass('app.livewire.administration.approval-flow.index')
         );
+
+        $this->assertSame(
+            Index::class,
+            Livewire::getClass('approval-flows.index')
+        );
+
+        $this->assertSame(
+            Index::class,
+            Livewire::getClass('approval-flows')
+        );
+
+        $this->assertSame(
+            Index::class,
+            Livewire::getClass('administration.approval-flows')
+        );
     }
 }
 

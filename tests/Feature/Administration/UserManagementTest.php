@@ -106,4 +106,15 @@ class UserManagementTest extends TestCase
 
         return $user->refresh();
     }
+
+    public function test_user_component_resolves_by_aliases(): void
+    {
+        $this->assertSame(Index::class, Livewire::getClass('administration.user.index'));
+        $this->assertSame(Index::class, Livewire::getClass('administration.users'));
+        $this->assertSame(Index::class, Livewire::getClass('administration.users.index'));
+        $this->assertSame(Index::class, Livewire::getClass('users.index'));
+        $this->assertSame(Index::class, Livewire::getClass('users'));
+        $this->assertSame(Index::class, Livewire::getClass('app.livewire.administration.user.index'));
+        $this->assertSame(Index::class, Livewire::getClass('app.livewire.administration.users'));
+    }
 }

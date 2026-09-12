@@ -315,4 +315,25 @@ class AccessGroupTest extends TestCase
             'email' => 'developer@example.com',
         ]);
     }
+
+    public function test_access_group_and_menu_components_resolve_by_aliases(): void
+    {
+        // AccessGroup
+        $this->assertSame(AccessGroupIndex::class, Livewire::getClass('administration.access-group.index'));
+        $this->assertSame(AccessGroupIndex::class, Livewire::getClass('administration.access-groups'));
+        $this->assertSame(AccessGroupIndex::class, Livewire::getClass('administration.access-groups.index'));
+        $this->assertSame(AccessGroupIndex::class, Livewire::getClass('access-groups.index'));
+        $this->assertSame(AccessGroupIndex::class, Livewire::getClass('access-groups'));
+        $this->assertSame(AccessGroupIndex::class, Livewire::getClass('app.livewire.administration.access-group.index'));
+        $this->assertSame(AccessGroupIndex::class, Livewire::getClass('app.livewire.administration.access-groups'));
+
+        // AccessMenu
+        $this->assertSame(AccessMenuIndex::class, Livewire::getClass('administration.access-menu.index'));
+        $this->assertSame(AccessMenuIndex::class, Livewire::getClass('administration.access-menus'));
+        $this->assertSame(AccessMenuIndex::class, Livewire::getClass('administration.access-menus.index'));
+        $this->assertSame(AccessMenuIndex::class, Livewire::getClass('access-menus.index'));
+        $this->assertSame(AccessMenuIndex::class, Livewire::getClass('access-menus'));
+        $this->assertSame(AccessMenuIndex::class, Livewire::getClass('app.livewire.administration.access-menu.index'));
+        $this->assertSame(AccessMenuIndex::class, Livewire::getClass('app.livewire.administration.access-menus'));
+    }
 }

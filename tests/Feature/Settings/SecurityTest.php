@@ -123,4 +123,22 @@ class SecurityTest extends TestCase
 
         $response->assertHasErrors(['current_password']);
     }
+
+    public function test_security_appearance_and_two_factor_components_resolve_by_aliases(): void
+    {
+        $this->assertSame(Security::class, Livewire::getClass('settings.security'));
+        $this->assertSame(Security::class, Livewire::getClass('settings.security.edit'));
+        $this->assertSame(Security::class, Livewire::getClass('security.edit'));
+        $this->assertSame(Security::class, Livewire::getClass('security'));
+        $this->assertSame(Security::class, Livewire::getClass('app.livewire.settings.security'));
+
+        $this->assertSame(\App\Livewire\Settings\Appearance::class, Livewire::getClass('settings.appearance'));
+        $this->assertSame(\App\Livewire\Settings\Appearance::class, Livewire::getClass('settings.appearance.edit'));
+        $this->assertSame(\App\Livewire\Settings\Appearance::class, Livewire::getClass('appearance.edit'));
+        $this->assertSame(\App\Livewire\Settings\Appearance::class, Livewire::getClass('appearance'));
+        $this->assertSame(\App\Livewire\Settings\Appearance::class, Livewire::getClass('app.livewire.settings.appearance'));
+
+        $this->assertSame(\App\Livewire\Settings\TwoFactor\RecoveryCodes::class, Livewire::getClass('settings.two-factor.recovery-codes'));
+        $this->assertSame(\App\Livewire\Settings\TwoFactor\RecoveryCodes::class, Livewire::getClass('app.livewire.settings.two-factor.recovery-codes'));
+    }
 }
