@@ -40,6 +40,10 @@
                                    }
                      },
     "scripts":  {
+                    "dev":  [
+                                "Composer\\Config::disableProcessTimeout",
+                                "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev.ps1"
+                            ],
                     "post-autoload-dump":  [
                                                "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
                                                "@php artisan package:discover --ansi"
