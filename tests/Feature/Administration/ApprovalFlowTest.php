@@ -141,4 +141,18 @@ class ApprovalFlowTest extends TestCase
             'm_document_level_id' => $level->id,
         ]);
     }
+
+    public function test_approval_flow_component_resolves_by_short_and_legacy_alias(): void
+    {
+        $this->assertSame(
+            Index::class,
+            Livewire::getClass('administration.approval-flow.index')
+        );
+
+        $this->assertSame(
+            Index::class,
+            Livewire::getClass('app.livewire.administration.approval-flow.index')
+        );
+    }
 }
+

@@ -61,5 +61,15 @@ class AppServiceProvider extends ServiceProvider
 
         Livewire::component('settings.delete-user-form', DeleteUserForm::class);
         Livewire::component('settings.two-factor.recovery-codes', RecoveryCodes::class);
+
+        Livewire::resolveMissingComponent(function (string $alias) {
+            if (str_starts_with($alias, 'app.livewire.')) {
+                $shortAlias = substr($alias, strlen('app.livewire.'));
+
+                return app(\Livewire\LivewireComponentsFinder::class)->find($shortAlias);
+            }
+
+            return null;
+        });
     }
 }
