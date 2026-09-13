@@ -40,6 +40,10 @@
                                    }
                      },
     "scripts":  {
+                    "dev":  [
+                                "Composer\\Config::disableProcessTimeout",
+                                "powershell -NoProfile -ExecutionPolicy Bypass -Command \"$server = Start-Process php -ArgumentList 'artisan','serve','--host=127.0.0.1','--port=8080' -NoNewWindow -PassThru; try { npm run watch } finally { Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue }\""
+                            ],
                     "post-autoload-dump":  [
                                                "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
                                                "@php artisan package:discover --ansi"
