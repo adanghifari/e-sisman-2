@@ -94,8 +94,20 @@
         display: none;
     }
 
-    .app-shell.is-sidebar-collapsed .sidebar-toggle span {
-        transform: rotate(180deg);
+        .sidebar-icon-open {
+        display: block;
+    }
+
+    .sidebar-icon-closed {
+        display: none;
+    }
+
+    .app-shell.is-sidebar-collapsed .sidebar-icon-open {
+        display: none !important;
+    }
+
+    .app-shell.is-sidebar-collapsed .sidebar-icon-closed {
+        display: block !important;
     }
 
     .app-shell.is-sidebar-collapsed .sidebar-scrollbar {

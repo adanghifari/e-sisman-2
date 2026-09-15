@@ -7,6 +7,12 @@
     <title>{{ $title ? $title.' - E-SISMAN' : 'E-SISMAN' }}</title>
     <link rel="stylesheet" href="{{ mix('css/app.css') }}">
     @livewireStyles
+    <style>
+        .sidebar-icon-open { display: block; }
+        .sidebar-icon-closed { display: none; }
+        .app-shell.is-sidebar-collapsed .sidebar-icon-open { display: none !important; }
+        .app-shell.is-sidebar-collapsed .sidebar-icon-closed { display: block !important; }
+    </style>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
     @php
@@ -74,7 +80,8 @@
                     <img src="{{ asset('image/esisman_logo.png') }}" alt="E-SISMAN" class="sidebar-brand-logo h-auto w-[140px] max-w-full object-contain">
                 </a>
                 <button type="button" class="sidebar-toggle grid size-9 shrink-0 place-items-center rounded-lg border border-sky-700 bg-sky-900 text-white shadow-sm transition hover:bg-sky-800" data-sidebar-toggle aria-label="Sembunyikan sidebar" aria-expanded="true">
-                    <span class="text-lg leading-none">‹</span>
+                    <x-flux.icon name="chevron-left" class="sidebar-icon-open size-4 text-white" />
+                    <x-flux.icon name="chevron-right" class="sidebar-icon-closed size-4 text-white" />
                 </button>
             </div>
 
@@ -125,7 +132,7 @@
                         <span class="text-sm font-extrabold text-white">E-SISMAN</span>
                     </a>
                     <button type="button" class="grid size-10 place-items-center rounded-lg border border-sky-700 bg-sky-900 text-white shadow-sm transition hover:bg-sky-800" data-mobile-nav-toggle aria-label="Tampilkan menu" aria-expanded="false">
-                        <span class="text-xl leading-none">?</span>
+                        <x-flux.icon name="bars-3" class="size-6 text-white" />
                     </button>
                 </header>
                 <div class="mobile-nav-panel border-b border-sky-800 bg-sky-950 text-white shadow-lg">
